@@ -1,7 +1,7 @@
 import { Button, ButtonProps } from '@chakra-ui/react';
 
 interface CustomButtonProps extends Omit<ButtonProps, 'ref'> {
-  text: string;
+  text: any;
   onClick: () => void;
   type?: 'button' | 'submit' | 'reset'; // Explicitly set the type for the prop
 }
