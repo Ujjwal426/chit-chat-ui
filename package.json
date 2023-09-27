@@ -2,9 +2,10 @@
   "name": "chit-chat-ui",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://127.0.0.1:9090",
   "dependencies": {
-    "@chakra-ui/react": "^2.6.1",
-    "@emotion/react": "^11.11.0",
+    "@chakra-ui/react": "^2.8.0",
+    "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -13,18 +14,37 @@
     "@types/node": "^16.18.34",
     "@types/react": "^18.2.7",
     "@types/react-dom": "^18.2.4",
-    "framer-motion": "^10.12.16",
+    "axios": "^1.4.0",
+    "env-cmd": "^10.1.0",
+    "formik": "^2.4.2",
+    "framer-motion": "^10.13.0",
+    "i": "^0.3.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^4.10.1",
+    "react-router-dom": "^6.14.2",
     "react-scripts": "5.0.1",
+    "react-scrollable-feed": "^1.3.2",
+    "react-toastify": "^9.1.3",
+    "socket.io-client": "^4.7.2",
     "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "yup": "^1.2.0"
   },
   "scripts": {
+    "start-dev": "env-cmd -e dev react-scripts start",
+    "build-dev": "CI=false && env-cmd -e dev react-scripts build ",
+    "start-stag": "env-cmd -e stag react-scripts start",
+    "build-stag": "CI=false && env-cmd -e stag react-scripts build",
+    "start-prod": "env-cmd -e prod react-scripts start",
+    "build-prod": "CI=false && env-cmd -e prod react-scripts build",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build --max_old_space_size=8000 build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "format": "prettier --write \"**/*.{js,jsx,json,md,html,css,less,scss}\""
   },
   "eslintConfig": {
     "extends": [
@@ -43,5 +63,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "npm": "^9.8.1"
   }
 }
