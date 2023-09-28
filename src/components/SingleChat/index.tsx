@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChatState } from '../../context/ChatProvider';
-import { Box, FormControl, IconButton, Input, Spinner, Text, useToast } from '@chakra-ui/react';
+import { Box, Divider, FormControl, IconButton, Input, Spinner, Text, useToast } from '@chakra-ui/react';
 import { IoMdArrowBack } from 'react-icons/io';
 import { getSender, getSenderWithFullDetails } from '../../config';
 import ProfileModal from '../ProfileModal';
@@ -8,6 +8,8 @@ import UpdateGroupChatModal from '../UpdateGroupChatModal';
 import AxiosUtils from '../../utils/AxiosUtils/axiosUtils';
 import axios from 'axios';
 import ScrollableChat from '../ScrollableChat';
+import Lottie from 'react-lottie';
+import animationData from '../../animations/typing.json';
 
 import io, { Socket } from 'socket.io-client';
 
@@ -21,8 +23,17 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: any) => {
   const [loading, setloading] = useState<boolean>(false);
   const [newMessage, setNewMessage] = useState('');
   const [socketConnected, setSocketConnected] = useState<boolean>(false);
-  const [typing, setTyping] = useState(false)
-  const [isTyping, setIsTyping] = useState(false)
+  const [typing, setTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice',
+    },
+  };
 
   const toast = useToast();
 
@@ -30,6 +41,22 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: any) => {
 
   const typeHandler = (e: any) => {
     setNewMessage(e.target.value);
+    if (!socketConnected) return;
+    if (!typing) {
+      setTyping(true);
+      socket.emit('typing', selectedChat._id);
+    }
+    console.log('Hii');
+    let lastTypeingTime = new Date().getTime();
+    let timerLength = 30000;
+    setTimeout(() => {
+      var timeNow = new Date().getTime();
+      let timeDiff = timeNow - lastTypeingTime;
+      if (timeDiff >= timerLength && typing) {
+        socket.emit('stop typing', selectedChat._id);
+        setTyping(false);
+      }
+    }, timerLength);
   };
 
   useEffect(() => {
@@ -37,9 +64,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: any) => {
 
     socket.emit('setup', user.user);
 
-    socket.on('connection', () => {
+    socket.on('connected', () => {
       setSocketConnected(true);
     });
+
+    socket.on('typing', () => setTyping(true));
+    socket.on('stop typing', () => setIsTyping(false));
   }, []);
 
   const fetchMessages = async () => {
@@ -94,6 +124,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: any) => {
 
   const sendMessage = async (event: any) => {
     if (event.key === 'Enter' && newMessage) {
+      socket.emit('stop typing', selectedChat._id);
       try {
         const config = AxiosUtils.axiosConfigConstructor(
           'post',
@@ -162,6 +193,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }: any) => {
               </div>
             )}
             <FormControl onKeyDown={sendMessage}>
+              {typing ? (
+                <div>
+                  <Lottie options={defaultOptions} width={70} style={{ marginBottom: 15, marginLeft: 0 }} />
+                </div>
+              ) : (
+                <div> </div>
+              )}
               <Input variant="filled" bg="#E0E0E0" placeholder="Enter a message....." value={newMessage} onChange={typeHandler} />
             </FormControl>
           </Box>
